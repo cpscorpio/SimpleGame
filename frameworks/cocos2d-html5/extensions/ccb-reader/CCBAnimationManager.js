@@ -353,8 +353,8 @@ cc.BuilderAnimationManager = cc.Class.extend({
 
         // Make callback at end of sequence
         var seq = this._getSequence(nSeqId);
-        var completeAction = cc.Sequence.create(cc.DelayTime.create(seq.getDuration() + tweenDuration),
-            cc.CallFunc.create(this._sequenceCompleted,this));
+        var completeAction = cc.sequence(cc.delayTime(seq.getDuration() + tweenDuration),
+            cc.callFunc(this._sequenceCompleted,this));
         this._rootNode.runAction(completeAction);
 
         // Playback callbacks and sounds
@@ -381,7 +381,7 @@ cc.BuilderAnimationManager = cc.Class.extend({
     runAnimations:function (name, tweenDuration) {
         tweenDuration = tweenDuration || 0;
         var nSeqId;
-        if(typeof(name) === "string")
+        if(cc.isString(name))
             nSeqId = this._getSequenceId(name);
         else
             nSeqId = name;
@@ -539,7 +539,13 @@ cc.BuilderAnimationManager = cc.Class.extend({
                 // TODO only handle rotation, opacity, displayFrame, color
                 if(propName === "rotation"){
                     node.setRotation(value);
-                } else if(propName === "opacity"){
+                }  else if(propName == "rotationX")
+                {
+                    node.setRotationSkewX(value);
+                }else if(propName == "rotationY")
+                {
+                    node.setRotationSkewY(value);
+                }else if(propName === "opacity"){
                     node.setOpacity(value);
                 } else if(propName === "displayFrame"){
                     node.setSpriteFrame(value);
@@ -634,8 +640,7 @@ cc.BuilderAnimationManager = cc.Class.extend({
                 }
             }
 
-            var seq = cc.Sequence.create(actions);
-            node.runAction(seq);
+            node.runAction(cc.sequence(actions));
         }
     },
 

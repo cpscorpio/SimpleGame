@@ -935,6 +935,8 @@ cc.BuilderReader = cc.Class.extend({
         if (this._currentBit >= 8) {
             this._currentBit = 0;
             this._currentByte++;
+            if(this._currentByte > this._data.length)
+                throw "out of the data bound";
         }
 
         return bit;
@@ -1060,7 +1062,7 @@ cc.BuilderReader.load = function (ccbFilePath, owner, parentSize, ccbRootPath) {
             controller[outletName] = outletNode;
         }
 
-        if (controller.onDidLoadFromCCB && typeof(controller.onDidLoadFromCCB) == "function")
+        if (controller.onDidLoadFromCCB && cc.isFunction(controller.onDidLoadFromCCB))
             controller.onDidLoadFromCCB();
 
         // Setup timeline callbacks

@@ -24,27 +24,34 @@
  ****************************************************************************/
 
 /**
- * Base class for ccs.DecorativeDisplay
+ * Decorative a display node for Cocos Armature
  * @class
  * @extends ccs.Class
  */
 ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
-    _display:null,
-    _colliderDetector:null,
-    _displayData:null,
+    _display: null,
+    _colliderDetector: null,
+    _displayData: null,
 
+    /**
+     * Construction of ccs.DecorativeDisplay
+     */
     ctor:function () {
         this._display = null;
         this._colliderDetector = null;
         this._displayData = null;
     },
 
+    /**
+     * Initializes a ccs.DecorativeDisplay
+     * @returns {boolean}
+     */
     init:function () {
         return true;
     },
 
     /**
-     * display setter
+     * Sets display node to decorative
      * @param {cc.Node} display
      */
     setDisplay:function (display) {
@@ -52,7 +59,7 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
     },
 
     /**
-     * display getter
+     * Returns the display node
      * @returns {cc.Node}
      */
     getDisplay:function () {
@@ -60,7 +67,7 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
     },
 
     /**
-     * colliderDetector setter
+     * Sets collide detector
      * @param {ccs.ColliderDetector} colliderDetector
      */
     setColliderDetector:function (colliderDetector) {
@@ -68,7 +75,7 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
     },
 
     /**
-     * colliderDetector getter
+     * Returns collide detector
      * @returns {ccs.ColliderDetector}
      */
     getColliderDetector:function () {
@@ -76,7 +83,7 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
     },
 
     /**
-     * display data setter
+     * Sets display data
      * @param {ccs.DisplayData} displayData
      */
     setDisplayData:function (displayData) {
@@ -84,26 +91,22 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
     },
 
     /**
-     * display data getter
+     * Returns display data
      * @returns {ccs.DisplayData}
      */
     getDisplayData:function () {
         return this._displayData;
     },
+
     release:function () {
-        CC_SAFE_RELEASE(this._display);
         this._display = null;
-        CC_SAFE_RELEASE(this._displayData);
         this._displayData = null;
-        CC_SAFE_RELEASE(this._colliderDetector);
         this._colliderDetector = null;
     }
-
 });
 
 /**
- * allocates and initializes a decorative display.
- * @constructs
+ * Allocates and initializes a decorative display.
  * @return {ccs.DecorativeDisplay}
  * @example
  * // example
@@ -111,8 +114,7 @@ ccs.DecorativeDisplay = ccs.Class.extend(/** @lends ccs.DecorativeDisplay# */{
  */
 ccs.DecorativeDisplay.create = function () {
     var decorativeDisplay = new ccs.DecorativeDisplay();
-    if (decorativeDisplay && decorativeDisplay.init()) {
+    if (decorativeDisplay && decorativeDisplay.init())
         return decorativeDisplay;
-    }
     return null;
 };

@@ -2,3 +2,6 @@ frameworks/js-bindings
 tools
 .idea
 test
+runtime
+.settings
+.project
