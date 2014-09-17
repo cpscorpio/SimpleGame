@@ -335,7 +335,8 @@ var HelloWorldLayer = cc.Layer.extend({
     showGameOver : function () {
 
 //        var userDefault = cc.UserDefault.getInstance();
-        var oldScore = 0; sys.localStorage.getItem("score");
+        var oldScore = 0;
+        // sys.localStorage.getItem("score");
         var maxScore = 0;
         // if( oldScore == null || this.score > oldScore) {
         //     maxScore = this.score;
