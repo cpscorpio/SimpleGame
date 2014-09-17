@@ -9,7 +9,7 @@ GROUND_Z = 99;
 BIRD_Z = 100;
 GAMEOVER_Z = 101;
 
-var FreFall = cc.ActionInterval.extend({
+var FreeFall = cc.ActionInterval.extend({
     timeElasped:0,
     m_positionDeltaY:null,
     m_startPosition:null,
@@ -32,7 +32,7 @@ var FreFall = cc.ActionInterval.extend({
     },
 
     initWithOffset:function(deltaPosition) {
-        //自由落体运动计算公式
+        // 自由落体运动计算公式
         var dropTime = Math.sqrt(2.0*Math.abs(deltaPosition)/k_Acceleration) * 0.1;
         cc.log("dropTime=" + dropTime);
         if (this.initWithDuration(dropTime))
@@ -52,7 +52,7 @@ var FreFall = cc.ActionInterval.extend({
     },
 
 
-    //Node的runAction函数会调用ActionManager的addAction函数，在ActionManager的addAction函数中会调用Action的startWithTarget，然后在Action类的startWithTarget函数中设置_target的值。
+    // Node的runAction函数会调用ActionManager的addAction函数，在ActionManager的addAction函数中会调用Action的startWithTarget，然后在Action类的startWithTarget函数中设置_target的值。
     startWithTarget:function(target) {
         cc.log("startWithTarget target=" + target);
         cc.ActionInterval.prototype.startWithTarget.call(this, target);
@@ -64,26 +64,26 @@ var FreFall = cc.ActionInterval.extend({
         this.timeElasped += dt;
         cc.log("isdone=" + this.timeElasped);
 
-        if (this._target && !(this.m_targetPosition.y >= this._target.getPositionY())) {
-            var yMoveOffset = 0.5 * k_Acceleration * this.timeElasped * this.timeElasped * 0.3;
+        if (this.getTarget() && !(this.m_targetPosition.y >= this.getTarget().getPositionY())) {
+            var yMoveOffset = 0.5 * k_Acceleration * this.timeElasped * this.timeElasped * 1.3;
             if (cc.ENABLE_STACKABLE_ACTIONS) {
                 var newPos =  cc.p(this.m_startPosition.x, this.m_startPosition.y - yMoveOffset);
                 if (this.m_targetPosition.y > newPos.y) {
                     newPos.y = this.m_targetPosition.y;
-                    this._target.stopAction(this);
+                    this.getTarget().stopAction(this);
                 }
 
-                this._target.setPosition(newPos);
+                this.getTarget().setPosition(newPos);
 
             } else {
-                this._target.setPosition(cc.p(this.m_startPosition.x, this.m_startPosition.y + this.m_positionDeltaY * dt));
+                this.getTarget().setPosition(cc.p(this.m_startPosition.x, this.m_startPosition.y + this.m_positionDeltaY * dt));
             }
         }
     }
 });
 
-FreFall.create = function(deltaPosition) {
-    var ff = new FreFall();
+FreeFall.create = function(deltaPosition) {
+    var ff = new FreeFall();
     ff.initWithOffset(deltaPosition);
     return ff;
 };
@@ -104,7 +104,7 @@ var HelloWorldLayer = cc.Layer.extend({
     scoreLabel:null,
 
     ctor:function () {
-        //////////////////////////////
+        // ////////////////////////////
         // 1. super init first
         this._super();
         this.PipeSpriteList = [];
@@ -127,7 +127,7 @@ var HelloWorldLayer = cc.Layer.extend({
 
         this.scheduleUpdate();
 
-        //touch
+        // touch
         cc.eventManager.addListener({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
@@ -174,7 +174,7 @@ var HelloWorldLayer = cc.Layer.extend({
             pipe.setPositionX(pipe.getPositionX() - 3);
             if (pipe.getPositionX() < -pipe.getContentSize().width / 2) {
                 this.PipeSpriteList.splice(i, 1);
-                //cc.log("delete pipe i=" + i);
+                // cc.log("delete pipe i=" + i);
             }
         }
 
@@ -202,7 +202,7 @@ var HelloWorldLayer = cc.Layer.extend({
     },
 
     initBird : function() {
-        //cc.log("initBird");
+        // cc.log("initBird");
         var animation = cc.animationCache.getAnimation("FlyBirdAnimation")
         if(!animation) {
             var animFrames = [];
@@ -218,8 +218,7 @@ var HelloWorldLayer = cc.Layer.extend({
             cc.animationCache.addAnimation(animation, "FlyBirdAnimation");
         }
 
-        this.flyBird = new cc.Sprite();
-        this.flyBird.initWithSpriteFrameName("bird1.png");
+        this.flyBird = new cc.Sprite("#bird1.png");
         this.flyBird.setAnchorPoint(cc.p(0.5, 0.5));
         this.flyBird.setPosition(this.winSize.width / 2, this.winSize.height / 2);
         this.addChild(this.flyBird, BIRD_Z);
@@ -231,20 +230,17 @@ var HelloWorldLayer = cc.Layer.extend({
     initReady : function() {
         this.readyLayer = new cc.Layer();
 
-        var logo = new cc.Sprite();
-        logo.initWithSpriteFrameName("flappybird.png")
+        var logo = new cc.Sprite("#flappybird.png");
         logo.setAnchorPoint(cc.p(0.5, 0.5));
         logo.setPosition(this.winSize.width / 2, this.winSize.height - logo.getContentSize().height - 50);
         this.readyLayer.addChild(logo);
 
-        var getReady = new cc.Sprite();
-        getReady.initWithSpriteFrameName("getready.png");
+        var getReady = new cc.Sprite("#getready.png");
         getReady.setAnchorPoint(cc.p(0.5, 0.5));
         getReady.setPosition(this.winSize.width / 2, this.winSize.height / 2 + getReady.getContentSize().height);
         this.readyLayer.addChild(getReady);
 
-        var click = new cc.Sprite();
-        click.initWithSpriteFrameName("click.png");
+        var click = new cc.Sprite("#click.png");
         click.setAnchorPoint(cc.p(0.5, 0.5));
         click.setPosition(this.winSize.width / 2, getReady.getPositionY() - getReady.getContentSize().height / 2 - click.getContentSize().height / 2);
         this.readyLayer.addChild(click);
@@ -264,35 +260,34 @@ var HelloWorldLayer = cc.Layer.extend({
         var actionFrame = new cc.Animate(cc.animationCache.getAnimation("FlyBirdAnimation"));
         var flyAction = new cc.RepeatForever(actionFrame);
 
-//上升动画
+// 上升动画
         var riseMoveAction = new cc.MoveTo(0.2, cc.p(birdX, birdY + riseHeight));
         var riseRotateAction = new cc.RotateTo(0, -30);
         var riseAction = new cc.Spawn(riseMoveAction, riseRotateAction);
 
-//下落动画
-//模拟自由落体运动
-        var fallMoveAction = FreFall.create(birdY - bottomY);
+// 下落动画
+// 模拟自由落体运动
+        var fallMoveAction = FreeFall.create(birdY - bottomY);
         var fallRotateAction = new cc.RotateTo(0, 30);
         var fallAction = new cc.Spawn(fallMoveAction, fallRotateAction);
 
         this.flyBird.stopAllActions();
         this.flyBird.runAction(flyAction);
-        this.flyBird.runAction(//new cc.Spawn(
-                new cc.Sequence(riseAction, fallAction)// )
+        this.flyBird.runAction( new cc.Spawn(
+                new cc.Sequence(riseAction, fallAction) )
         );
     },
 
 
     addPipe : function () {
         cc.log("addPipe");
-        var ccSpriteDown = new cc.Sprite();
-        ccSpriteDown.initWithSpriteFrameName("holdback1.png");
+        var ccSpriteDown = new cc.Sprite("#holdback1.png");
 
         var pipeHeight = ccSpriteDown.getContentSize().height;
         var pipeWidth = ccSpriteDown.getContentSize().width;
         var groundHeight = this.groundSprite.getContentSize().height;
 
-        //小鸟飞行区间高度
+        // 小鸟飞行区间高度
         var acrossHeight = 300;
 
         var downPipeHeight = 100 + getRandom(400);
@@ -301,13 +296,12 @@ var HelloWorldLayer = cc.Layer.extend({
 
         var PipeX = this.winSize.width + pipeWidth / 2;
 
-        ccSpriteDown.setZOrder(1);
+        ccSpriteDown.setLocalZOrder(1);
         ccSpriteDown.setAnchorPoint(cc.p(0.5, 0.5));
         ccSpriteDown.setPosition(cc.p(PipeX + pipeWidth / 2, groundHeight + pipeHeight / 2 - (pipeHeight - downPipeHeight)));
 
-        var ccSpriteUp = new cc.Sprite();
-        ccSpriteUp.initWithSpriteFrameName("holdback2.png");
-        ccSpriteUp.setZOrder(1);
+        var ccSpriteUp = new cc.Sprite("#holdback2.png");
+        ccSpriteUp.setLocalZOrder(1);
         ccSpriteUp.setAnchorPoint(cc.p(0.5, 0.5));
         ccSpriteUp.setPosition(cc.p(PipeX + pipeWidth / 2, this.winSize.height + (pipeHeight- upPipeHeight) - pipeHeight / 2));
 
@@ -334,40 +328,35 @@ var HelloWorldLayer = cc.Layer.extend({
 
     showGameOver : function () {
 
-//        var userDefault = cc.UserDefault.getInstance();
         var oldScore = 0;
-        // sys.localStorage.getItem("score");
+        cc.sys.localStorage.getItem("score");
         var maxScore = 0;
-        // if( oldScore == null || this.score > oldScore) {
-        //     maxScore = this.score;
-        //     sys.localStorage.setItem("score", maxScore);
-        // }else {
-        //     maxScore = oldScore;
-        // }
+		if( oldScore == null || this.score > oldScore) {
+		     maxScore = this.score;
+		     cc.sys.localStorage.setItem("score", maxScore);
+		 }else {
+		     maxScore = oldScore;
+		 }
 
         var gameOverLayer = new cc.Layer();
         cc.log("gameover=" + "gameover.png");
-        var gameOver = new cc.Sprite();
-        gameOver.initWithSpriteFrameName("gameover.png");
+        var gameOver = new cc.Sprite("#gameover.png");
         gameOver.setAnchorPoint(cc.p(0.5, 0.5));
         gameOver.setPosition(this.winSize.width / 2, this.winSize.height - gameOver.getContentSize().height / 2 - 150);
         gameOverLayer.addChild(gameOver);
 
-        var scorePanel = new cc.Sprite();
-        scorePanel.initWithSpriteFrameName("base.png");
+        var scorePanel = new cc.Sprite("#base.png");
         scorePanel.setAnchorPoint(cc.p(0.5, 0.5));
         scorePanel.setPosition(gameOver.getPositionX(), gameOver.getPositionY() - gameOver.getContentSize().height / 2 - scorePanel.getContentSize().height / 2 - 60);
         gameOverLayer.addChild(scorePanel);
 
         if(this.score > oldScore) {
-            var gold = new cc.Sprite();
-            gold.initWithSpriteFrameName("yellow.png");
+            var gold = new cc.Sprite("#yellow.png");
             gold.setAnchorPoint(cc.p(0.5, 0.5));
             gold.setPosition(68 + gold.getContentSize().width / 2, 72 + gold.getContentSize().height / 2);
             scorePanel.addChild(gold);
         }else {
-            var gray = new cc.Sprite();
-            gray.initWithSpriteFrameName("gray.png");
+            var gray = new cc.Sprite("#gray.png");
             gray.setAnchorPoint(cc.p(0.5, 0.5));
             gray.setPosition(68 + gray.getContentSize().width / 2, 72 + gray.getContentSize().height / 2);
             scorePanel.addChild(gray);
@@ -385,8 +374,7 @@ var HelloWorldLayer = cc.Layer.extend({
         maxScoreLabel.setPosition(newScoreLabel.getPositionX(), maxScoreLabel.getContentSize().height / 2 + 75);
         scorePanel.addChild(maxScoreLabel);
 
-        var start = new cc.Sprite();
-        start.initWithSpriteFrameName("start.png");
+        var start = new cc.Sprite("#start.png");
         var startMenuItem = new cc.MenuItemSprite(start, null, null, this.restartGame, this);
         var startMenu = new cc.Menu(startMenuItem);
 
@@ -412,7 +400,7 @@ var HelloWorldLayer = cc.Layer.extend({
         var birdY = this.flyBird.getPositionY();
 
         var bottomY = this.groundSprite.getContentSize().height + this.flyBird.getContentSize().width / 2;
-        var fallMoveAction = FreFall.create(birdY - bottomY);
+        var fallMoveAction = FreeFall.create(birdY - bottomY);
         var fallRotateAction =cc.RotateTo.create(0, 90);
         var fallAction = cc.Spawn.create(fallMoveAction, fallRotateAction);
 
@@ -427,7 +415,7 @@ var HelloWorldLayer = cc.Layer.extend({
 
     checkCollision : function () {
         if (this.collide(this.flyBird, this.groundSprite)) {
-            //cc.log("hit floor");
+            // cc.log("hit floor");
             this.birdFallAction();
             return;
         }
