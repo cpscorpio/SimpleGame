@@ -335,14 +335,14 @@ var HelloWorldLayer = cc.Layer.extend({
     showGameOver : function () {
 
 //        var userDefault = cc.UserDefault.getInstance();
-        var oldScore = sys.localStorage.getItem("score");
+        // var oldScore = sys.localStorage.getItem("score");
         var maxScore = 0;
-        if( oldScore == null || this.score > oldScore) {
-            maxScore = this.score;
-            sys.localStorage.setItem("score", maxScore);
-        }else {
-            maxScore = oldScore;
-        }
+        // if( oldScore == null || this.score > oldScore) {
+        //     maxScore = this.score;
+        //     sys.localStorage.setItem("score", maxScore);
+        // }else {
+        //     maxScore = oldScore;
+        // }
 
         var gameOverLayer = new cc.Layer();
         cc.log("gameover=" + "gameover.png");
