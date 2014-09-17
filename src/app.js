@@ -34,13 +34,13 @@ var FreFall = cc.ActionInterval.extend({
     initWithOffset:function(deltaPosition) {
         //自由落体运动计算公式
         var dropTime = Math.sqrt(2.0*Math.abs(deltaPosition)/k_Acceleration) * 0.1;
-        //cc.log("dropTime=" + dropTime);
+        cc.log("dropTime=" + dropTime);
         if (this.initWithDuration(dropTime))
         {
             this.m_positionDeltaY = deltaPosition;
             return true;
         }
-        //cc.log("dropTime =" + dropTime + "; deltaPosition=" + deltaPosition);
+        cc.log("dropTime =" + dropTime + "; deltaPosition=" + deltaPosition);
         return false;
     },
 
@@ -54,7 +54,7 @@ var FreFall = cc.ActionInterval.extend({
 
     //Node的runAction函数会调用ActionManager的addAction函数，在ActionManager的addAction函数中会调用Action的startWithTarget，然后在Action类的startWithTarget函数中设置_target的值。
     startWithTarget:function(target) {
-        //cc.log("startWithTarget target=" + target);
+        cc.log("startWithTarget target=" + target);
         cc.ActionInterval.prototype.startWithTarget.call(this, target);
         this.m_startPosition = target.getPosition();
         this.m_targetPosition = cc.p(this.m_startPosition.x, this.m_startPosition.y  - this.m_positionDeltaY);
@@ -62,7 +62,7 @@ var FreFall = cc.ActionInterval.extend({
 
     update:function(dt) {
         this.timeElasped += dt;
-        //cc.log("isdone=" + this.timeElasped);
+        cc.log("isdone=" + this.timeElasped);
 
         if (this._target && !(this.m_targetPosition.y >= this._target.getPositionY())) {
             var yMoveOffset = 0.5 * k_Acceleration * this.timeElasped * this.timeElasped * 0.3;
