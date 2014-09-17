@@ -9,6 +9,8 @@ GROUND_Z = 99;
 BIRD_Z = 100;
 GAMEOVER_Z = 101;
 
+DT = 0.04;
+
 var FreeFall = cc.ActionInterval.extend({
     timeElasped:0,
     m_positionDeltaY:null,
@@ -44,14 +46,6 @@ var FreeFall = cc.ActionInterval.extend({
         return false;
     },
 
-    isDone:function() {
-        if (this.m_targetPosition.y >= this._target.getPositionY()) {
-            return true;
-        }
-        return false;
-    },
-
-
     // Node的runAction函数会调用ActionManager的addAction函数，在ActionManager的addAction函数中会调用Action的startWithTarget，然后在Action类的startWithTarget函数中设置_target的值。
     startWithTarget:function(target) {
         cc.log("startWithTarget target=" + target);
@@ -62,20 +56,30 @@ var FreeFall = cc.ActionInterval.extend({
 
     update:function(dt) {
         this.timeElasped += dt;
-        cc.log("isdone=" + this.timeElasped);
+//        cc.log("isdone=" + this.timeElasped);
 
         if (this.getTarget() && !(this.m_targetPosition.y >= this.getTarget().getPositionY())) {
-            var yMoveOffset = 0.5 * k_Acceleration * this.timeElasped * this.timeElasped * 1.3;
+
+            var yMoveOffset = 1.5 * k_Acceleration * this.timeElasped * this.timeElasped  ;
+            if (this.getTarget().getParent().gameMode == OVER)
+            {
+                yMoveOffset = yMoveOffset * 20;
+            }
             if (cc.ENABLE_STACKABLE_ACTIONS) {
+                cc.log("0");
                 var newPos =  cc.p(this.m_startPosition.x, this.m_startPosition.y - yMoveOffset);
                 if (this.m_targetPosition.y > newPos.y) {
                     newPos.y = this.m_targetPosition.y;
                     this.getTarget().stopAction(this);
+                    this.getTarget().getParent().isFallDown();
+                    cc.log("OK!!!!!");
+
                 }
 
                 this.getTarget().setPosition(newPos);
 
             } else {
+                cc.log("1");
                 this.getTarget().setPosition(cc.p(this.m_startPosition.x, this.m_startPosition.y + this.m_positionDeltaY * dt));
             }
         }
@@ -98,6 +102,7 @@ var HelloWorldLayer = cc.Layer.extend({
 
     passTime: 0,
     winSize: 0,
+
     screenRect:null,
     readyLayer:null,
     score: 0,
@@ -118,6 +123,9 @@ var HelloWorldLayer = cc.Layer.extend({
 
         this.initGround();
         this.initReady();
+
+        this.whiteLayer = new cc.LayerColor(cc.color(255,255,255,0), this.winSize.width * 1.2, this.winSize.height * 1.2);
+        this.addChild( this.whiteLayer, 1000);
 
         this.screenRect = cc.rect(0, 0, this.winSize.width, this.winSize.height);
 
@@ -193,7 +201,9 @@ var HelloWorldLayer = cc.Layer.extend({
         var halfGroundW = this.groundSprite.getContentSize().width;
         var halfGroundH = this.groundSprite.getContentSize().height;
         this.groundSprite.setAnchorPoint(0.5, 0.5);
-        this.groundSprite.setPosition(halfGroundW / 2, halfGroundH / 2);
+        var offset = (this.bgSprite.getContentSize().height - this.winSize.height)/2;
+        this.groundSprite.setAnchorPoint(0.5,0);
+        this.groundSprite.setPosition(halfGroundW / 2, -offset);
         this.addChild(this.groundSprite, GROUND_Z);
         var action1 = new cc.MoveTo(0.5, cc.p(halfGroundW / 2 - 120, this.groundSprite.getPositionY()));
         var action2 = new cc.MoveTo(0, cc.p(halfGroundW / 2, this.groundSprite.getPositionY()));
@@ -249,11 +259,12 @@ var HelloWorldLayer = cc.Layer.extend({
     },
 
     runBirdAction : function () {
-        var riseHeight = 50;
+        var riseHeight = this.winSize.height * 0.08;
         var birdX = this.flyBird.getPositionX();
         var birdY = this.flyBird.getPositionY();
 
-        var bottomY = this.groundSprite.getContentSize().height - this.flyBird.getContentSize().height / 2;
+
+        var bottomY = this.groundSprite.getContentSize().height + this.groundSprite.getPosition().y - this.flyBird.getContentSize().height / 2 ;
 
 
 
@@ -285,7 +296,7 @@ var HelloWorldLayer = cc.Layer.extend({
 
         var pipeHeight = ccSpriteDown.getContentSize().height;
         var pipeWidth = ccSpriteDown.getContentSize().width;
-        var groundHeight = this.groundSprite.getContentSize().height;
+        var groundHeight = this.groundSprite.getContentSize().height + this.groundSprite.getPosition().y;
 
         // 小鸟飞行区间高度
         var acrossHeight = 300;
@@ -339,7 +350,6 @@ var HelloWorldLayer = cc.Layer.extend({
 		 }
 
         var gameOverLayer = new cc.Layer();
-        cc.log("gameover=" + "gameover.png");
         var gameOver = new cc.Sprite("#gameover.png");
         gameOver.setAnchorPoint(cc.p(0.5, 0.5));
         gameOver.setPosition(this.winSize.width / 2, this.winSize.height - gameOver.getContentSize().height / 2 - 150);
@@ -392,20 +402,37 @@ var HelloWorldLayer = cc.Layer.extend({
         cc.director.runScene( new cc.TransitionFade(1.2, scene));
     },
 
+    shake : function() {
+        cc.log("shake")
+        var h = cc.director.getWinSize().height;
+        this.runAction(new cc.Sequence(
+            new cc.MoveBy(0.01, cc.p(0, - h * DT/2)),
+            new cc.MoveBy(0.02, cc.p(0, h * DT)),
+            new cc.MoveBy(0.01, cc.p(0, - h * DT/2))
+        ));
+    },
+    whiteLayer:null,
     birdFallAction : function () {
+
+        // hit action
+        this.shake();
+        this.whiteLayer.runAction( new cc.Sequence(
+            new cc.FadeIn( DT), new cc.FadeOut(DT)
+        ));
         this.gameMode = OVER;
         this.flyBird.stopAllActions();
         this.groundSprite.stopAllActions();
         var birdX = this.flyBird.getPositionX();
         var birdY = this.flyBird.getPositionY();
-
-        var bottomY = this.groundSprite.getContentSize().height + this.flyBird.getContentSize().width / 2;
+        var bottomY = this.groundSprite.getContentSize().height  + this.groundSprite.getPosition().y + this.flyBird.getContentSize().width / 2;
         var fallMoveAction = FreeFall.create(birdY - bottomY);
-        var fallRotateAction =cc.RotateTo.create(0, 90);
-        var fallAction = cc.Spawn.create(fallMoveAction, fallRotateAction);
+        var fallRotateAction =new cc.RotateTo(0, 90);
+        var fallAction = new cc.Spawn(fallMoveAction, fallRotateAction);
 
-        this.flyBird.runAction( new cc.Sequence( new cc.DelayTime(0.1),
-                fallAction)
+        this.flyBird.runAction( new cc.Sequence(
+                new cc.DelayTime(0.1),
+                fallAction
+            )
         );
 
         this.runAction( new cc.Sequence( new cc.DelayTime(1.0),
@@ -413,12 +440,23 @@ var HelloWorldLayer = cc.Layer.extend({
         );
     },
 
-    checkCollision : function () {
-        if (this.collide(this.flyBird, this.groundSprite)) {
-            // cc.log("hit floor");
+    isFallDown:function(){
+        if ( this.gameMode != OVER)
+        {
             this.birdFallAction();
-            return;
         }
+        else
+        {
+            this.shake();
+        }
+    },
+
+    checkCollision : function () {
+//        if (this.collide(this.flyBird, this.groundSprite)) {
+//            // cc.log("hit floor");
+//            this.birdFallAction();
+//            return;
+//        }
 
         for (var i = 0; i < this.PipeSpriteList.length; i++) {
             var pipe = this.PipeSpriteList[i];

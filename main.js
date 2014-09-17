@@ -49,10 +49,11 @@
 
 cc.game.onStart = function(){
     cc.view.adjustViewPort(true);
-    cc.view.setDesignResolutionSize(720, 1280, cc.ResolutionPolicy.EXACT_FIT);
+    cc.view.setDesignResolutionSize(720, 1180, cc.ResolutionPolicy.SHOW_ALL);
     cc.view.resizeWithBrowserSize(true);
     //load resources
-    cc.LoaderScene.preload(g_resources, function () {
+
+    Loading.preload(g_resources, function () {
         cc.director.runScene(new HelloWorldScene());
     }, this);
 };
