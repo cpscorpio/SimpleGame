@@ -385,10 +385,10 @@ var HelloWorldLayer = cc.Layer.extend({
         maxScoreLabel.setPosition(newScoreLabel.getPositionX(), maxScoreLabel.getContentSize().height / 2 + 75);
         scorePanel.addChild(maxScoreLabel);
 
-        var start = cc.Sprite();
+        var start = new cc.Sprite();
         start.initWithSpriteFrameName("start.png");
         var startMenuItem = new cc.MenuItemSprite(start, null, null, this.restartGame, this);
-        var startMenu = cc.Menu.create(startMenuItem);
+        var startMenu = new cc.Menu(startMenuItem);
 
         startMenu.setAnchorPoint(cc.p(0.5, 0.5));
         startMenu.setPosition(this.winSize.width / 2 , scorePanel.getPositionY() - scorePanel.getContentSize().height / 2 - start.getContentSize().height / 2 - 60);
