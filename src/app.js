@@ -277,8 +277,8 @@ var HelloWorldLayer = cc.Layer.extend({
 
         this.flyBird.stopAllActions();
         this.flyBird.runAction(flyAction);
-        this.flyBird.runAction(new cc.Spawn(
-                new cc.Sequence(riseAction, fallAction) )
+        this.flyBird.runAction(//new cc.Spawn(
+                new cc.Sequence(riseAction, fallAction)// )
         );
     },
 
